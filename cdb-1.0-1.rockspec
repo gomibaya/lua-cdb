@@ -19,7 +19,7 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    tdb = {
+    cdb = {
       sources = {"src/cdb.c", "src/lcdb.c"},
       incdirs = {"inc"}
     }
