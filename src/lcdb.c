@@ -13,7 +13,7 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-#include "srv.h"
+#include "cdb.h"
 #include "size.h"
 
 static const char lcdbtype[] = "cdb_handle";
@@ -127,7 +127,7 @@ int luaopen_cdb ( lua_State *L ) {
 	lua_pushvalue(L, -2);
 	lua_rawset(L, -3);
 	lua_pop( L, 1 );
-	luaL_register( L, SLN_CDBNAME, lcdb_lib );
+	luaL_register( L, "cdb", lcdb_lib );
 	return 1;
 }
 
