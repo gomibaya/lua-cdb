@@ -11,7 +11,8 @@ description = {
     A small standalone rock to read and traverse CDB data files.
   ]],
   homepage = "git://github.com/istr/lua-cdb",
-  license = "MIT/X11"
+  license = "MIT/X11",
+  maintainer = "Ingo Struck <lua@ingostruck.de>"
 }
 dependencies = {
   "lua >= 5.1"
