@@ -17,11 +17,34 @@
 #include "size.h"
 
 static const char lcdbtype[] = "cdb_handle";
+static const char lcdb[] = "cdb";
 
 typedef struct {
 	Cdb cdb;
 	char *fn;
 } Lcdb;
+
+#if LUA_VERSION_NUM < 502
+typedef struct luaL_Reg {
+  const char *name;
+  lua_CFunction func;
+} luaL_Reg;
+/*
+** Adapted from Lua 5.2.0
+*/
+static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
+  luaL_checkstack(L, nup+1, "too many upvalues");
+  for (; l->name != NULL; l++) {  /* fill the table with given functions */
+    int i;
+    lua_pushstring(L, l->name);
+    for (i = 0; i < nup; i++)  /* copy upvalues to the top */
+      lua_pushvalue(L, -(nup+1));
+    lua_pushcclosure(L, l->func, nup);  /* closure with those upvalues */
+    lua_settable(L, -(nup + 3));
+  }
+  lua_pop(L, nup);  /* remove upvalues */
+}
+#endif
 
 static int lcdb_open( lua_State *L ) {
 	Cdb cdb;
@@ -65,7 +88,7 @@ static int lcdb_get ( lua_State *L ) {
 		lua_pushlstring( L, v, vlen );
 		return 1;
 	case CDB_CORRUPT:
-		luaL_error( L, "lcdb_get - cdb `%s´ is corrupt", lcdb->fn );
+		luaL_error( L, "lcdb_get - cdb `%sï¿½ is corrupt", lcdb->fn );
 	}
 	if ( 2 < lua_gettop( L ) ) {
 		lua_pushvalue( L, 3 );
@@ -105,7 +128,7 @@ static int lcdb_name ( lua_State *L ) {
 	public functions
 */
 
-static struct luaL_reg lcdb_meta_lib[] = {
+static struct luaL_Reg lcdb_meta_lib[] = {
 	 { "__gc", lcdb_close }
 	,{ "__tostring", lcdb_tostring }
 	,{ "close", lcdb_close }
@@ -115,19 +138,20 @@ static struct luaL_reg lcdb_meta_lib[] = {
 	,{ 0, 0 }
 };
 
-static const luaL_reg lcdb_lib[] = {
+static const struct luaL_Reg lcdb_lib[] = {
 	 { "open", lcdb_open }
 	,{ 0, 0 }
 };
 
 int luaopen_cdb ( lua_State *L ) {
 	luaL_newmetatable( L, lcdbtype );
-	luaL_register(L, 0, lcdb_meta_lib);
+	luaL_setfuncs(L, lcdb_meta_lib, 0);
 	lua_pushliteral( L, "__index");
 	lua_pushvalue(L, -2);
 	lua_rawset(L, -3);
 	lua_pop( L, 1 );
-	luaL_register( L, "cdb", lcdb_lib );
+	lua_newtable(L);
+	luaL_setfuncs(L, lcdb_lib, 0);
 	return 1;
 }
 

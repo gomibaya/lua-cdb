@@ -1,8 +1,8 @@
 package = "cdb"
 version = "1.0-1"
 source = {
-  url = "git://github.com/istr/lua-cdb",
-  tag = "v1.0"
+  url = "git://github.com/gomibaya/lua-cdb",
+  branch = "LUA52"
 }
 description = {
   summary = "A Lua binding to djb's CDB.",
